@@ -16,14 +16,15 @@
         android:layout_weight="1"
         android:ems="10"
         android:hint="username" />
+
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:hint="username"
-        android:inputType="textPassword"/>
+        android:hint="password"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/btnLogin"
@@ -32,4 +33,12 @@
         android:layout_marginTop="15dp"
         android:layout_weight="1"
         android:text="Login" />
+
+    <Button
+        android:id="@+id/btnSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:text="Sign Up" />
 </LinearLayout>
