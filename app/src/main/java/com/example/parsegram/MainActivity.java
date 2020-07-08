@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        bottomNavigationView.setSelectedItemId(R.id.actiion_compose);
+        bottomNavigationView.setSelectedItemId(R.id.action_home);
         //queryPosts();
     }
 
