@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private Context context;
     private List<Post> posts;
+    private ParseUser user;
 
     public PostsAdapter(Context context, List<Post> posts){
         this.context = context;
@@ -46,6 +48,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvUsername;
         TextView tvUsername2;
         TextView tvDescription;
+        TextView tvLikes;
+        TextView tvWordLike;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -53,15 +57,33 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvUsername2 = itemView.findViewById(R.id.tvUsername2);
+            tvLikes = itemView.findViewById(R.id.tvLikes);
+            tvWordLike = itemView.findViewById(R.id.tvWordLikes);
         }
 
         public void bind(Post post) {
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
             tvUsername2.setText(post.getUser().getUsername());
+
+            //post.zeroLikes();
+            post.addLike(ParseUser.getCurrentUser());
+            int likes = post.getLikes();
+            tvLikes.setText(Integer.toString(post.getLikes()));
+            if(likes == 1)
+                tvWordLike.setText("like");
+
             ParseFile image = post.getImage();
             if(image != null)
                 Glide.with(context).load(image.getUrl()).into(ivImage);
+        }
+
+        void userLiked(){
+
+        }
+
+        void userUnliked(){
+
         }
     }
 }
