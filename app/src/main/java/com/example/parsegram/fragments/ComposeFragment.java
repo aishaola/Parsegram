@@ -71,7 +71,6 @@ public class ComposeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup any handles to view objects here
-        // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
         ivPostImage = view.findViewById(R.id.ivPostImage);
         etDescription = view.findViewById(R.id.etDescription);
         btnSubmit = view.findViewById(R.id.btnSubmit);
@@ -185,22 +184,6 @@ public class ComposeFragment extends Fragment {
     }
 
 
-    private void queryPosts(){
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        query.include(Post.KEY_USER);
 
-        query.findInBackground(new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> objects, ParseException e) {
-                if(e != null){
-                    Log.e(TAG, "done: Issue with getting posts!", e);
-                    return;
-                }
-                for(Post post: objects){
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", user: " + post.getUser().getUsername());
-                }
-            }
-        });
-    }
 
 }

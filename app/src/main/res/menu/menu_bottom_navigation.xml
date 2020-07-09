@@ -7,7 +7,7 @@
         android:title="Home"
         app:showAsAction="always" />
     <item
-        android:id="@+id/actiion_compose"
+        android:id="@+id/action_compose"
         android:icon="@drawable/instagram_new_post_outline_24"
         android:title="Compose"
         app:showAsAction="always" />

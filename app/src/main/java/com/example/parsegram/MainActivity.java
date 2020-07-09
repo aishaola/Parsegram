@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.parsegram.fragments.ComposeFragment;
+import com.example.parsegram.fragments.PostsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         // define your fragments here
         final Fragment composeFragment = new ComposeFragment();
+        final Fragment postsFragment = new PostsFragment();
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -57,18 +59,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
                 switch (item.getItemId()) {
-                    case R.id.actiion_compose:
+                    case R.id.action_compose:
                         fragment = composeFragment;
-                        Toast.makeText(MainActivity.this, "Compose!!", Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.action_profile:
-                        // TODO: Update frag
                         fragment = composeFragment;
-                        Toast.makeText(MainActivity.this, "Profile!!", Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.action_home:
                     default:
                         // TODO: Update frag
-                        fragment = composeFragment;
-                        Toast.makeText(MainActivity.this, "Home!!", Toast.LENGTH_SHORT).show();
+                        fragment = postsFragment;
+                        break;
                 }
 
                 // Replace the contents of the container with the new fragment
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
         bottomNavigationView.setSelectedItemId(R.id.action_home);
         //queryPosts();
     }
