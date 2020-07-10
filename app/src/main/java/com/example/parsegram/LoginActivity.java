@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -20,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText etPassword;
     Button btnLogin;
     Button btnSignUp;
+    ImageView ivLogo;
 
     public static final String TAG = LoginActivity.class.getSimpleName();
     @Override
@@ -30,6 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         if(ParseUser.getCurrentUser() != null){
             goMainActivity();
         }
+
+        ivLogo = findViewById(R.id.ivLogo);
+        Glide.with(this).load("https://fontmeme.com/images/instagram-new-logo.png").into(ivLogo);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
