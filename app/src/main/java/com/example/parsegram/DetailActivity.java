@@ -37,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     TextView tvDescription;
     TextView tvLikes;
     TextView tvWordLike;
+    TextView tvTimestamp;
     int likes;
     boolean userHasLiked;
 
@@ -52,7 +53,7 @@ public class DetailActivity extends AppCompatActivity {
         tvUsername2 = findViewById(R.id.tvUsername2);
         tvLikes = findViewById(R.id.tvLikes);
         tvWordLike = findViewById(R.id.tvWordLikes);
-
+        tvTimestamp = findViewById(R.id.tvTS);
 
         // unwrap the movie passed in via intent, using its simple name as a key
         post = (PostParcel) Parcels.unwrap(getIntent().getParcelableExtra(Post.class.getSimpleName()));
@@ -61,7 +62,9 @@ public class DetailActivity extends AppCompatActivity {
         tvDescription.setText(post.description);
         tvUsername.setText(post.username);
         tvUsername2.setText(post.username);
+        tvTimestamp.setText(post.timestamp);
         userHasLiked = (post.userHasLiked);
+
         likes = post.likes;
         initializeLikesView();
 

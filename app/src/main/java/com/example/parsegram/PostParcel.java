@@ -14,12 +14,13 @@ public class PostParcel {
     public PostParcel(){
 
     }
-    public PostParcel(Post post){
+    public PostParcel(Post post, String ts){
         username = post.getUser().getUsername();
         description = post.getDescription();
         userHasLiked = post.userHasLikedPost();
         likes = post.getNumberOfLikes();
         imageUrl = post.getImage().getUrl();
+        timestamp = ts;
 
     }
 

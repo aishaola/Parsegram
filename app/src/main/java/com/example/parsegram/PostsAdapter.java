@@ -3,6 +3,7 @@ package com.example.parsegram;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Movie;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
@@ -27,7 +29,9 @@ import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private Context context;
@@ -79,6 +83,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvWordLike;
         TextView tvTimestamp;
         int likes;
+        String ts;
         boolean userHasLiked;
 
         public ViewHolder(@NonNull View itemView) {
@@ -91,6 +96,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvLikes = itemView.findViewById(R.id.tvLikes);
             tvWordLike = itemView.findViewById(R.id.tvWordLikes);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
+            ts="";
 
 
 
@@ -113,7 +119,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 // create intent for the new activity
                 Intent intent = new Intent(context, DetailActivity.class);
                 // serialize the movie using parceler, use its short name as a key
-                intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(new PostParcel(post)));
+                intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(new PostParcel(post, ts)));
                 //intent.putExtra("ViewHolder", Parcels.wrap(this));
                 // show the activity
                 context.startActivity(intent);
@@ -127,10 +133,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             userHasLiked = (post.userHasLikedPost());
 
             String date = post.getCreatedAt().toString();
-            StringBuilder dateFormat = new StringBuilder(date);
-            tvTimestamp.setText(dateFormat.delete(10, 23).toString());
-
-            //tvTimestamp.setText(post.getCreatedAt().toString());
+            ts = getRelativeTimeAgo(date);
+            tvTimestamp.setText(ts);
             updateLikesView(post);
             for (ParseUser user: post.usersLiked) {
                 Log.i("LIKES ON POST",  user.getUsername() + " likes "  + post.getDescription() + post.userHasLikedPost());
@@ -154,6 +158,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ParseFile image = post.getImage();
             if(image != null)
                 Glide.with(context).load(image.getUrl()).into(ivImage);
+        }
+
+        public String getRelativeTimeAgo(String rawJsonDate) {
+            String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+            SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
+            sf.setLenient(true);
+
+            String relativeDate = "";
+            try {
+                long dateMillis = sf.parse(rawJsonDate).getTime();
+                relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
+                        System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+
+            return relativeDate;
         }
 
         // updates the view to accurately represent number of likes and fill in heart
