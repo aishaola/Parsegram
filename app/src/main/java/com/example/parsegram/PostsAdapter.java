@@ -1,6 +1,8 @@
 package com.example.parsegram;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Movie;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.parceler.Parcel;
+import org.parceler.Parcels;
+
 import java.io.File;
 import java.util.List;
 
@@ -35,9 +40,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         this.user = ParseUser.getCurrentUser();
     }
 
+    public void clear() {
+        posts.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(List<Post> list) {
+        posts.addAll(list);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         View view = LayoutInflater.from(context).inflate(R.layout.item_post, parent, false);
         return new ViewHolder(view);
     }
@@ -60,8 +77,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvDescription;
         TextView tvLikes;
         TextView tvWordLike;
+        int likes;
         boolean userHasLiked;
-        Likes userLike;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,27 +89,51 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername2 = itemView.findViewById(R.id.tvUsername2);
             tvLikes = itemView.findViewById(R.id.tvLikes);
             tvWordLike = itemView.findViewById(R.id.tvWordLikes);
+
+            likes = posts.get(getAdapterPosition()).getNumberOfLikes();
+            initializeLikesView();
+
+            ivImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    showDetailsActivity();
+                }
+            });
+        }
+
+        void showDetailsActivity(){
+            // gets item position
+            int position = getAdapterPosition();
+            // make sure the position is valid, i.e. actually exists in the view
+            if (position != RecyclerView.NO_POSITION) {
+                // get the movie at the position, this won't work if the class is static
+                Post post = posts.get(position);
+                // create intent for the new activity
+                Intent intent = new Intent(context, DetailActivity.class);
+                // serialize the movie using parceler, use its short name as a key
+                intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(new PostParcel(post)));
+                //intent.putExtra("ViewHolder", Parcels.wrap(this));
+                // show the activity
+                context.startActivity(intent);
+            }
         }
 
         public void bind(final Post post) {
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
             tvUsername2.setText(post.getUser().getUsername());
-            userHasLiked = !(post.userHasLikedPost());
+            userHasLiked = (post.userHasLikedPost());
             updateLikesView(post);
             for (ParseUser user: post.usersLiked) {
                 Log.i("LIKES ON POST",  user.getUsername() + " likes "  + post.getDescription() + post.userHasLikedPost());
             }
 
-
-            //post.zeroLikes();
-            //post.addLike(ParseUser.getCurrentUser());
-
             ivLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     userHasLiked = !userHasLiked;
-                    if(userHasLiked){
+                    if(!userHasLiked){
                         saveUnlike(post);
                     } else{
                         saveLike(post);
@@ -111,7 +152,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             int likes = post.getNumberOfLikes();
             tvLikes.setText(Integer.toString(likes));
 
-            if(!userHasLiked){
+            if(userHasLiked){
                 ivLike.setImageResource(R.drawable.ufi_heart_active);
             } else{
                 ivLike.setImageResource(R.drawable.ufi_heart);
@@ -123,10 +164,26 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 tvWordLike.setText("likes");
         }
 
+        void initializeLikesView(){
+            if(userHasLiked){
+                ivLike.setImageResource(R.drawable.ufi_heart_active);
+            } else{
+                ivLike.setImageResource(R.drawable.ufi_heart);
+            }
+            tvLikes.setText(Integer.toString(likes));
+
+            if(likes == 1)
+                tvWordLike.setText("like");
+            else
+                tvWordLike.setText("likes");
+
+            userHasLiked = !userHasLiked;
+        }
+
         // This function send ADD query to Likes.class table and sets hasLiked boolean to true
         // Adds user who liked to LikedUser User<List> for post
         void saveLike(Post post) {
-            userLike = new Likes();
+            Likes userLike = new Likes();
             userLike.setPost(post);
             userLike.setUser(ParseUser.getCurrentUser());
 

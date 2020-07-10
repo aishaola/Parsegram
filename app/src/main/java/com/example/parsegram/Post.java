@@ -6,6 +6,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +48,6 @@ public class Post extends ParseObject {
         put(KEY_USER, user);
     }
 
-    public int getLikes() { return getInt(KEY_LIKES); }
-
     public int getNumberOfLikes() { return getInt(KEY_LIKES); }
 
     public List<ParseUser> getUsersLiked() {
@@ -62,21 +62,23 @@ public class Post extends ParseObject {
         return false;
     }
 
-    public void addLike(ParseUser user) {
-        usersLiked.add(user);
+    public void saveLikes(){
         put(KEY_LIKES, usersLiked.size());
         saveInBackground();
+    }
+
+    public void addLike(ParseUser user) {
+        usersLiked.add(user);
+        saveLikes();
     }
 
     public void zeroLikes() {
         usersLiked = new ArrayList<>();
-        put(KEY_LIKES, 0);
-        saveInBackground();
+        saveLikes();
     }
 
     public void removeLike(ParseUser user) {
         usersLiked.remove(user);
-        put(KEY_LIKES, usersLiked.size());
-        saveInBackground();
+        saveLikes();
     }
 }

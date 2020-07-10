@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class PostsFragment extends Fragment {
     public static final String TAG = PostsFragment.class.getSimpleName();
     List<Post> posts;
     PostsAdapter adapter;
+    SwipeRefreshLayout swipeContainer;
 
     public PostsFragment() {
         // Required empty public constructor
@@ -58,8 +60,24 @@ public class PostsFragment extends Fragment {
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully
+                queryPosts();
+            }
+        });
 
 
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         /*
         Steps to use Recycler view
         0. create layout for one item in view
@@ -70,7 +88,7 @@ public class PostsFragment extends Fragment {
          */
     }
 
-    protected void queryPosts(){
+    public void queryPosts(){
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.setLimit(20);
@@ -80,15 +98,22 @@ public class PostsFragment extends Fragment {
             @Override
             public void done(List<Post> objects, ParseException e) {
                 if(e != null){
-                    Log.e(TAG, "done: Issue with getting posts!", e);
+                    Log.e(TAG, "Network error: Issue with getting posts!", e);
+                    swipeContainer.setRefreshing(false);
                     return;
                 }
-                posts.addAll(objects);
-                for(Post post: posts){
+
+                adapter.clear();
+
+                for(Post post: objects){
                     //post.usersLiked.addAll(likeylikes);
                     queryLikes(post);
+                    posts.add(post);
                     Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
                 }
+
+                adapter.addAll(posts);
+                swipeContainer.setRefreshing(false);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -110,13 +135,11 @@ public class PostsFragment extends Fragment {
                     return;
                 }
                 // for each row in Likes.class, add User to corresponding Post's List of Users
-                int count = 0;
+                //int count = 0;
                 for(Likes like: objects){
-                    Post likedPost = like.getPost();
                     ParseUser userWhoLiked = like.getUser();
-                    usersLiked.add(userWhoLiked);
                     Log.i(TAG, "queryLikes: Just added user " +  userWhoLiked.getUsername() +
-                            " to post with description: " + likedPost.getDescription() + " " +
+                            " to post with description: " + post.getDescription() + " " +
                             usersLiked.size());
                     post.addLike(userWhoLiked);
                 }

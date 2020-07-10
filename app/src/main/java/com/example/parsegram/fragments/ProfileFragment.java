@@ -13,7 +13,7 @@ import java.util.List;
 public class ProfileFragment extends PostsFragment {
 
     @Override
-    protected void queryPosts() {
+    public void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.setLimit(20);
@@ -24,15 +24,22 @@ public class ProfileFragment extends PostsFragment {
             @Override
             public void done(List<Post> objects, ParseException e) {
                 if(e != null){
-                    Log.e(TAG, "done: Issue with getting posts!", e);
+                    Log.e(TAG, "Network error: Issue with getting posts!", e);
+                    swipeContainer.setRefreshing(false);
                     return;
                 }
-                posts.addAll(objects);
-                for(Post post: posts){
+
+                adapter.clear();
+
+                for(Post post: objects){
                     //post.usersLiked.addAll(likeylikes);
                     queryLikes(post);
+                    posts.add(post);
                     Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
                 }
+
+                adapter.addAll(posts);
+                swipeContainer.setRefreshing(false);
                 adapter.notifyDataSetChanged();
             }
         });
