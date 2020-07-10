@@ -14,9 +14,8 @@ public class Post extends ParseObject {
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_IMAGE = "Image";
     public static final String KEY_USER = "user";
-    public static final String KEY_CREATED = "createdAt";
     public static final String KEY_LIKES = "likes";
-    List<ParseUser> usersLiked;
+    public List<ParseUser> usersLiked;
 
     public Post(){
         super();
@@ -49,9 +48,23 @@ public class Post extends ParseObject {
 
     public int getLikes() { return getInt(KEY_LIKES); }
 
+    public int getNumberOfLikes() { return getInt(KEY_LIKES); }
+
+    public List<ParseUser> getUsersLiked() {
+        return usersLiked;
+    }
+
+    public boolean userHasLikedPost(){
+        for (ParseUser user: usersLiked) {
+            if(user.getUsername().equals(ParseUser.getCurrentUser().getUsername()))
+                return true;
+        }
+        return false;
+    }
+
     public void addLike(ParseUser user) {
         usersLiked.add(user);
-        put(KEY_LIKES, (getLikes() + 1));
+        put(KEY_LIKES, usersLiked.size());
         saveInBackground();
     }
 
@@ -63,7 +76,7 @@ public class Post extends ParseObject {
 
     public void removeLike(ParseUser user) {
         usersLiked.remove(user);
-        put(KEY_LIKES, (getLikes() - 1));
+        put(KEY_LIKES, usersLiked.size());
         saveInBackground();
     }
 }

@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.parsegram.Likes;
 import com.example.parsegram.Post;
 import com.example.parsegram.PostsAdapter;
 import com.example.parsegram.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +54,10 @@ public class PostsFragment extends Fragment {
         posts = new ArrayList<Post>();
 
         adapter = new PostsAdapter(getContext(), posts);
+        queryPosts();
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
-        queryPosts();
+
 
 
         /*
@@ -81,11 +84,44 @@ public class PostsFragment extends Fragment {
                     return;
                 }
                 posts.addAll(objects);
+                for(Post post: posts){
+                    //post.usersLiked.addAll(likeylikes);
+                    queryLikes(post);
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                }
                 adapter.notifyDataSetChanged();
-                for(Post post: objects){
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", user: " + post.getUser().getUsername());
+            }
+        });
+        adapter.notifyDataSetChanged();
+    }
+
+    protected void queryLikes(final Post post) {
+        ParseQuery<Likes> query = ParseQuery.getQuery(Likes.class);
+        query.include(Likes.KEY_POST);
+        query.include(Likes.KEY_USER);
+        query.whereEqualTo(Likes.KEY_POST, post);
+
+        query.findInBackground(new FindCallback<Likes>() {
+            @Override
+            public void done(List<Likes> objects, ParseException e) {
+                List<ParseUser> usersLiked = new ArrayList<>();
+                if(e != null){
+                    Log.e(TAG, "done: Issue with getting posts!", e);
+                    return;
+                }
+                // for each row in Likes.class, add User to corresponding Post's List of Users
+                int count = 0;
+                for(Likes like: objects){
+                    Post likedPost = like.getPost();
+                    ParseUser userWhoLiked = like.getUser();
+                    usersLiked.add(userWhoLiked);
+                    Log.i(TAG, "queryLikes: Just added user " +  userWhoLiked.getUsername() +
+                            " to post with description: " + likedPost.getDescription() + " " +
+                            usersLiked.size());
+                    post.addLike(userWhoLiked);
                 }
             }
         });
+
     }
 }

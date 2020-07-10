@@ -28,11 +28,14 @@ public class ProfileFragment extends PostsFragment {
                     return;
                 }
                 posts.addAll(objects);
-                adapter.notifyDataSetChanged();
-                for(Post post: objects){
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", user: " + post.getUser().getUsername());
+                for(Post post: posts){
+                    //post.usersLiked.addAll(likeylikes);
+                    queryLikes(post);
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
                 }
+                adapter.notifyDataSetChanged();
             }
         });
+        adapter.notifyDataSetChanged();
     }
 }
