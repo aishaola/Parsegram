@@ -77,6 +77,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvDescription;
         TextView tvLikes;
         TextView tvWordLike;
+        TextView tvTimestamp;
         int likes;
         boolean userHasLiked;
 
@@ -89,9 +90,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername2 = itemView.findViewById(R.id.tvUsername2);
             tvLikes = itemView.findViewById(R.id.tvLikes);
             tvWordLike = itemView.findViewById(R.id.tvWordLikes);
+            tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
 
-            likes = posts.get(getAdapterPosition()).getNumberOfLikes();
-            initializeLikesView();
+
 
             ivImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -124,10 +125,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername.setText(post.getUser().getUsername());
             tvUsername2.setText(post.getUser().getUsername());
             userHasLiked = (post.userHasLikedPost());
+            tvTimestamp.setText(post.getPostCreatedAt());
             updateLikesView(post);
             for (ParseUser user: post.usersLiked) {
                 Log.i("LIKES ON POST",  user.getUsername() + " likes "  + post.getDescription() + post.userHasLikedPost());
             }
+            likes = post.getNumberOfLikes();
+            initializeLikesView();
 
             ivLike.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -149,15 +153,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         // updates the view to accurately represent number of likes and fill in heart
         void updateLikesView(Post post){
-            int likes = post.getNumberOfLikes();
-            tvLikes.setText(Integer.toString(likes));
 
-            if(userHasLiked){
+
+            if(!userHasLiked){
+                likes++;
                 ivLike.setImageResource(R.drawable.ufi_heart_active);
             } else{
+                likes--;
                 ivLike.setImageResource(R.drawable.ufi_heart);
             }
-
+            tvLikes.setText(Integer.toString(likes));
             if(likes == 1)
                 tvWordLike.setText("like");
             else
@@ -165,7 +170,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         void initializeLikesView(){
-            if(userHasLiked){
+            if(!userHasLiked){
                 ivLike.setImageResource(R.drawable.ufi_heart_active);
             } else{
                 ivLike.setImageResource(R.drawable.ufi_heart);
@@ -176,8 +181,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 tvWordLike.setText("like");
             else
                 tvWordLike.setText("likes");
-
-            userHasLiked = !userHasLiked;
         }
 
         // This function send ADD query to Likes.class table and sets hasLiked boolean to true

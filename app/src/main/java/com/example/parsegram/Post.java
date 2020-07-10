@@ -1,6 +1,7 @@
 package com.example.parsegram;
 
-import com.parse.Parse;
+import android.text.format.DateUtils;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -8,9 +9,13 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+@Parcel(analyze={Post.class})
 @ParseClassName("Post")
 public class Post extends ParseObject {
     public static final String KEY_DESCRIPTION = "description";
@@ -27,6 +32,25 @@ public class Post extends ParseObject {
     public String getDescription(){
         return getString(KEY_DESCRIPTION);
     }
+
+    public String getPostCreatedAt() {
+        Date createdAt = getDate("createdAt");
+        if(createdAt!= null)
+            return "200h";
+
+        //String relativeDate = DateUtils.getRelativeTimeSpanString(createdAt.getTime(),
+        //        System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+
+        return "7h";
+    }
+
+    public String getRelativeTimeAgo(Date date) {
+        String relativeDate = DateUtils.getRelativeTimeSpanString(date.getTime(),
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+
+        return relativeDate;
+    }
+
 
     public void setDescription(String description){
         put(KEY_DESCRIPTION, description);
