@@ -125,7 +125,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername.setText(post.getUser().getUsername());
             tvUsername2.setText(post.getUser().getUsername());
             userHasLiked = (post.userHasLikedPost());
-            tvTimestamp.setText(post.getPostCreatedAt());
+
+            String date = post.getCreatedAt().toString();
+            StringBuilder dateFormat = new StringBuilder(date);
+            tvTimestamp.setText(dateFormat.delete(10, 23).toString());
+
+            //tvTimestamp.setText(post.getCreatedAt().toString());
             updateLikesView(post);
             for (ParseUser user: post.usersLiked) {
                 Log.i("LIKES ON POST",  user.getUsername() + " likes "  + post.getDescription() + post.userHasLikedPost());

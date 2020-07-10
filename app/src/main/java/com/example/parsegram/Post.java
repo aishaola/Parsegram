@@ -33,7 +33,7 @@ public class Post extends ParseObject {
         return getString(KEY_DESCRIPTION);
     }
 
-    public String getPostCreatedAt() {
+   /* public String getPostCreatedAt() {
         Date createdAt = getDate("createdAt");
         if(createdAt!= null)
             return "200h";
@@ -42,7 +42,7 @@ public class Post extends ParseObject {
         //        System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
 
         return "7h";
-    }
+    }*/
 
     public String getRelativeTimeAgo(Date date) {
         String relativeDate = DateUtils.getRelativeTimeSpanString(date.getTime(),

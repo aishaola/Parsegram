@@ -9,6 +9,7 @@ public class PostParcel {
     boolean userHasLiked;
     int likes;
     String imageUrl;
+    String timestamp;
 
     public PostParcel(){
 
@@ -19,6 +20,7 @@ public class PostParcel {
         userHasLiked = post.userHasLikedPost();
         likes = post.getNumberOfLikes();
         imageUrl = post.getImage().getUrl();
+
     }
 
 }
