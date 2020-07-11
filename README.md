@@ -22,7 +22,7 @@ The following **stretch** features are implemented:
 - [x] Style the login page to look like the real Instagram login page.
 - [x] Style the feed to look like the real Instagram feed.
 - [x] User should switch between different tabs - viewing all posts (feed view), capture (camera and photo gallery view) and profile tabs (posts made) using fragments and a Bottom Navigation View.
-- [ ] User can load more posts once he or she reaches the bottom of the feed using endless scrolling.
+- [x] User can load more posts once he or she reaches the bottom of the feed using endless scrolling.
 - [x] Show the username and creation time for each post
 - [ ] After the user submits a new post, show an indeterminate progress bar while the post is being uploaded to Parse
 - User Profiles:
@@ -46,7 +46,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/aishaola/Parsegram/blob/master/Kapture%202020-07-10%20at%2023.30.18.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/aishaola/Parsegram/blob/master/instaWalkthrough.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
