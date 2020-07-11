@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         ivLogo = findViewById(R.id.ivLogo);
-        Glide.with(this).load("https://fontmeme.com/images/instagram-new-logo.png").into(ivLogo);
+        Glide.with(this).load("http://fontmeme.com/images/instagram-new-logo.png").into(ivLogo);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);

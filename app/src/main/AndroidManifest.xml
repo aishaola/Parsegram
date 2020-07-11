@@ -6,7 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         android:name=".ParseApplication"
         android:usesCleartextTraffic="true">
@@ -21,16 +22,21 @@
                 android:resource="@xml/fileprovider" />
         </provider>
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:label="Instagram">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+
+        <activity android:name=".MainActivity"
+            android:label="Instagram">
         </activity>
-        <activity android:name=".DetailActivity">
+
+        <activity android:name=".DetailActivity"
+            android:label="Instagram">
         </activity>
     </application>
 
