@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -43,6 +44,7 @@ public class ProfileFragment extends PostsFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
         tvUsername = view.findViewById(R.id.tvUser);
 
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
@@ -102,6 +104,38 @@ public class ProfileFragment extends PostsFragment {
             }
         });
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void loadNextDataFromApi(int page) {
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
+        query.include(Post.KEY_CREATED_AT);
+        query.setLimit(3);
+        query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
+        Post lastPost = posts.get(posts.size()-1);
+        query.whereLessThan(Post.KEY_CREATED_AT, lastPost.getCreatedAt());
+
+        query.addDescendingOrder(Post.KEY_CREATED_AT);
+
+        query.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> objects, ParseException e) {
+                if(e != null){
+                    Log.e(TAG, "Network error: Issue with getting posts!", e);
+                    swipeContainer.setRefreshing(false);
+                    return;
+                }
+
+                for(Post post: objects){
+                    //post.usersLiked.addAll(likeylikes);
+                    queryLikes(post);
+                    posts.add(post);
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
 

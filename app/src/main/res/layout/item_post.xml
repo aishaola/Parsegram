@@ -39,7 +39,7 @@
             android:scaleType="centerCrop"
             tools:srcCompat="@tools:sample/avatars"></ImageView>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
@@ -58,6 +58,7 @@
                 android:id="@+id/ivCommentBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/ivLikeBtn"
                 android:layout_marginLeft="6dp"
                 android:layout_marginBottom="8dp"
                 card_view:srcCompat="@drawable/ufi_comment"></ImageView>
@@ -66,11 +67,20 @@
                 android:id="@+id/ivSendBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/ivCommentBtn"
                 android:layout_marginLeft="6dp"
                 android:layout_marginBottom="8dp"
                 card_view:srcCompat="@drawable/direct"></ImageView>
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/saveBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="5dp"
+                card_view:srcCompat="@drawable/ufi_save_icon"></ImageView>
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.parsegram.EndlessRecyclerViewScrollListener;
 import com.example.parsegram.Likes;
 import com.example.parsegram.Post;
 import com.example.parsegram.PostsAdapter;
@@ -24,6 +25,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +34,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class PostsFragment extends Fragment {
-    private RecyclerView rvPosts;
+    protected RecyclerView rvPosts;
+    protected EndlessRecyclerViewScrollListener scrollListener;
     public static final String TAG = PostsFragment.class.getSimpleName();
     List<Post> posts;
     PostsAdapter adapter;
@@ -57,11 +60,29 @@ public class PostsFragment extends Fragment {
 
         adapter = new PostsAdapter(getContext(), posts);
         queryPosts();
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+
+        // *** Endless pagination feature implemented here: ***
+        // Retain an instance so that you can call `resetState()` for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
+            }
+        };
+
+        // Adds the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
+        // *** Endless pagination feature ends here: ***
+
+        rvPosts.setLayoutManager(linearLayoutManager);
         rvPosts.setAdapter(adapter);
-        rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // *** Swipe to REFRESH feature implemented here: ***
         swipeContainer = view.findViewById(R.id.swipeContainer);
-
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -71,28 +92,50 @@ public class PostsFragment extends Fragment {
                 queryPosts();
             }
         });
-
-
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        /*
-        Steps to use Recycler view
-        0. create layout for one item in view
-        1. create adapter
-        2. create the data source
-        3. set the adapter on the rvview
-        4. add layout manager to the rvview
-         */
+
+        // *** Swipe to REFRESH feature ends here: ***
+
+    }
+
+    protected void loadNextDataFromApi(int page) {
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
+        query.include(Post.KEY_CREATED_AT);
+        query.setLimit(3);
+        Post lastPost = posts.get(posts.size()-1);
+        query.whereLessThan(Post.KEY_CREATED_AT, lastPost.getCreatedAt());
+        query.addDescendingOrder(Post.KEY_CREATED_AT);
+
+        query.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> objects, ParseException e) {
+                if(e != null){
+                    Log.e(TAG, "Network error: Issue with getting posts!", e);
+                    swipeContainer.setRefreshing(false);
+                    return;
+                }
+
+                for(Post post: objects){
+                    //post.usersLiked.addAll(likeylikes);
+                    queryLikes(post);
+                    posts.add(post);
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void queryPosts(){
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.include(Post.KEY_CREATED_AT);
-        query.setLimit(20);
+        query.setLimit(3);
         query.addDescendingOrder(Post.KEY_CREATED_AT);
 
         query.findInBackground(new FindCallback<Post>() {
@@ -105,7 +148,7 @@ public class PostsFragment extends Fragment {
                 }
 
                 adapter.clear();
-
+                scrollListener.resetState();
                 for(Post post: objects){
                     //post.usersLiked.addAll(likeylikes);
                     queryLikes(post);
@@ -113,7 +156,6 @@ public class PostsFragment extends Fragment {
                     Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
                 }
 
-                adapter.addAll(posts);
                 swipeContainer.setRefreshing(false);
                 adapter.notifyDataSetChanged();
             }
