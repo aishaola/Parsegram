@@ -27,7 +27,7 @@ import java.util.List;
 public class DetailActivity extends AppCompatActivity {
 
     // the movie to display
-    PostParcel post;
+    Post post;
 
     // the view objects
     ImageView ivImage;
@@ -56,64 +56,46 @@ public class DetailActivity extends AppCompatActivity {
         tvTimestamp = findViewById(R.id.tvTS);
 
         // unwrap the movie passed in via intent, using its simple name as a key
-        post = (PostParcel) Parcels.unwrap(getIntent().getParcelableExtra(Post.class.getSimpleName()));
-        Log.d("PostDetailsActivity", String.format("Showing details for '%s'", post.description));
+        post = Parcels.unwrap(getIntent().getParcelableExtra(Post.class.getSimpleName()));
+        post.initBoolAndLikes();
+        Log.d("PostDetailsActivity", String.format("Showing details for '%s'", post.getDescription()));
 
-        tvDescription.setText(post.description);
-        tvUsername.setText(post.username);
-        tvUsername2.setText(post.username);
-        tvTimestamp.setText(post.timestamp);
-        userHasLiked = (post.userHasLiked);
+        tvDescription.setText(post.getDescription());
+        tvUsername.setText(post.getUser().getUsername());
+        tvUsername2.setText(post.getUser().getUsername());
+        tvTimestamp.setText(post.getRelativeTimeAgo());
 
-        likes = post.likes;
-        initializeLikesView();
-
+        updateLikesView(post);
         ivLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateLikesView();
+                post.updateLike();
+                updateLikesView(post);
             }
         });
 
-        if(post.imageUrl != null)
-            Glide.with(this).load(post.imageUrl).into(ivImage);
+        ParseFile image = post.getImage();
+        if(image != null)
+            Glide.with(this).load(image.getUrl()).into(ivImage);
+
     }
 
     // updates the view to accurately represent number of likes and fill in heart
-    void updateLikesView(){
-
-        if(userHasLiked){
-            likes++;
-            ivLike.setImageResource(R.drawable.ufi_heart_active);
-        } else{
-            likes--;
-            ivLike.setImageResource(R.drawable.ufi_heart);
-        }
-        tvLikes.setText(Integer.toString(likes));
-
-        if(likes == 1)
-            tvWordLike.setText("like");
-        else
-            tvWordLike.setText("likes");
-
-        userHasLiked = !userHasLiked;
-    }
-
-    void initializeLikesView(){
-        if(userHasLiked){
+    // updates the view to accurately represent number of likes and fill in heart
+    void updateLikesView(Post post){
+        if(post.userHasLiked){
             ivLike.setImageResource(R.drawable.ufi_heart_active);
         } else{
             ivLike.setImageResource(R.drawable.ufi_heart);
         }
-        tvLikes.setText(Integer.toString(likes));
-
-        if(likes == 1)
+        tvLikes.setText(Integer.toString(post.likes));
+        if(post.likes == 1)
             tvWordLike.setText("like");
         else
             tvWordLike.setText("likes");
-
-        userHasLiked = !userHasLiked;
     }
+
+
 
 
 }

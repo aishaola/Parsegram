@@ -76,7 +76,7 @@ public class ProfileFragment extends PostsFragment {
     public void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.setLimit(20);
+        query.setLimit(4);
         query.whereEqualTo(Post.KEY_USER, ParseUser.getCurrentUser());
         query.addDescendingOrder(Post.KEY_CREATED_AT);
 
@@ -92,10 +92,9 @@ public class ProfileFragment extends PostsFragment {
                 adapter.clear();
 
                 for(Post post: objects){
-                    //post.usersLiked.addAll(likeylikes);
-                    queryLikes(post);
+                    post.initBoolAndLikes();
                     posts.add(post);
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.likes +  ", user: " + post.getUser().getUsername());
                 }
 
                 adapter.addAll(posts);
@@ -103,7 +102,6 @@ public class ProfileFragment extends PostsFragment {
                 adapter.notifyDataSetChanged();
             }
         });
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -129,9 +127,9 @@ public class ProfileFragment extends PostsFragment {
 
                 for(Post post: objects){
                     //post.usersLiked.addAll(likeylikes);
-                    queryLikes(post);
+                    post.initBoolAndLikes();
                     posts.add(post);
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.likes +  ", user: " + post.getUser().getUsername());
                 }
                 adapter.notifyDataSetChanged();
             }

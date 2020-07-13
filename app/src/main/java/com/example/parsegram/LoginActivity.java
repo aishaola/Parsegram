@@ -92,7 +92,9 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 // Navigate to main activity if user logged in correctly
+                Log.i(TAG, "login: workingggg");
                 goMainActivity();
+
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -102,6 +104,6 @@ public class LoginActivity extends AppCompatActivity {
     private void goMainActivity() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
-        //finish();
+        finish();
     }
 }

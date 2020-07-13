@@ -30,7 +30,6 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PostsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class PostsFragment extends Fragment {
@@ -73,7 +72,6 @@ public class PostsFragment extends Fragment {
                 loadNextDataFromApi(page);
             }
         };
-
         // Adds the scroll listener to RecyclerView
         rvPosts.addOnScrollListener(scrollListener);
         // *** Endless pagination feature ends here: ***
@@ -86,9 +84,6 @@ public class PostsFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully
                 queryPosts();
             }
         });
@@ -121,8 +116,7 @@ public class PostsFragment extends Fragment {
                 }
 
                 for(Post post: objects){
-                    //post.usersLiked.addAll(likeylikes);
-                    queryLikes(post);
+                    post.initBoolAndLikes();
                     posts.add(post);
                     Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
                 }
@@ -135,7 +129,8 @@ public class PostsFragment extends Fragment {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.include(Post.KEY_CREATED_AT);
-        query.setLimit(3);
+        query.include(Post.KEY_USERS_LIKED);
+        query.setLimit(20);
         query.addDescendingOrder(Post.KEY_CREATED_AT);
 
         query.findInBackground(new FindCallback<Post>() {
@@ -150,44 +145,16 @@ public class PostsFragment extends Fragment {
                 adapter.clear();
                 scrollListener.resetState();
                 for(Post post: objects){
-                    //post.usersLiked.addAll(likeylikes);
-                    queryLikes(post);
+                    post.initBoolAndLikes();
                     posts.add(post);
-                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.usersLiked.size() +  ", user: " + post.getUser().getUsername());
+                    Log.i(TAG, "done: post: " + post.getDescription() + ", likes: " + post.likes +  ", user: " + post.getUser().getUsername());
                 }
 
                 swipeContainer.setRefreshing(false);
-                adapter.notifyDataSetChanged();
+
             }
         });
         adapter.notifyDataSetChanged();
     }
 
-    protected void queryLikes(final Post post) {
-        ParseQuery<Likes> query = ParseQuery.getQuery(Likes.class);
-        query.include(Likes.KEY_POST);
-        query.include(Likes.KEY_USER);
-        query.whereEqualTo(Likes.KEY_POST, post);
-
-        query.findInBackground(new FindCallback<Likes>() {
-            @Override
-            public void done(List<Likes> objects, ParseException e) {
-                List<ParseUser> usersLiked = new ArrayList<>();
-                if(e != null){
-                    Log.e(TAG, "done: Issue with getting posts!", e);
-                    return;
-                }
-                // for each row in Likes.class, add User to corresponding Post's List of Users
-                //int count = 0;
-                for(Likes like: objects){
-                    ParseUser userWhoLiked = like.getUser();
-                    Log.i(TAG, "queryLikes: Just added user " +  userWhoLiked.getUsername() +
-                            " to post with description: " + post.getDescription() + " " +
-                            usersLiked.size());
-                    post.addLike(userWhoLiked);
-                }
-            }
-        });
-
-    }
 }
